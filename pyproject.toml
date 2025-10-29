@@ -1,0 +1,10 @@
+[project]
+name = "xyzbeto"
+version = "0.1.0"
+description = "Add your description here"
+requires-python = ">=3.13"
+dependencies = [
+    "notebook>=7.4.7",
+    "rdkit>=2025.9.1",
+    "xyz-py>=5.19.1",
+]
