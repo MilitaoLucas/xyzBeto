@@ -1,10 +1,17 @@
 [project]
 name = "xyzbeto"
 version = "0.1.0"
-description = "Add your description here"
+description = "XYZ molecular cluster file converter to PDB and Excel formats"
 requires-python = ">=3.13"
 dependencies = [
     "notebook>=7.4.7",
+    "openbabel-wheel>=3.1.1.22",
+    "openpyxl>=3.1.5",
+    "pandas>=2.3.3",
+    "pandas-stubs==2.3.2.250926",
     "rdkit>=2025.9.1",
     "xyz-py>=5.19.1",
 ]
+
+[project.scripts]
+xyz-convert = "convert_xyz:main"
