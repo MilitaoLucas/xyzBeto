@@ -100,7 +100,7 @@ def find_all_molecules(adj_matrix: np.ndarray[np.int8]):
     return components
 
 def main(filename: str, mol_prefix: str = "mol", min_distance: float = 0.2, tolerance: float = 1.2,
-                         output_pdb: str = "all_molecules.pdb", output_excel: str = None):
+                         output_pdb: str = "all_molecules.pdb", output_excel: str = None, output_csv: str = None):
     with open(filename, "r") as f:
         contents = [i.strip() for i in f.readlines() if i.strip() != ""]
 
@@ -143,10 +143,16 @@ def main(filename: str, mol_prefix: str = "mol", min_distance: float = 0.2, tole
         molecules_labeled[key] = data
     df = pd.DataFrame(ls_data)
     
-    if output_excel is None:
-        output_excel = filename.replace(".xyz", ".xlsx")
+    # Add Excel output if specified
+    if output_excel is not None:
+        df.to_excel(output_excel, index=False, header=["Molecule Label", "Atom Label"])
     
-    df.to_excel(output_excel, index=False, header=["Molecule Label", "Atom Label"])
+    # Set default CSV output if not specified
+    if output_csv is None:
+        output_csv = filename.replace(".xyz", ".csv")
+    
+    df.to_csv(output_csv, index=False, header=["Molecule Label", "Atom Label"])
+    
     write_cluster_pdb(molecules_labeled, bonds_labeled, output_pdb)
     return molecules_labeled, ls_data
 
@@ -154,14 +160,16 @@ def main(filename: str, mol_prefix: str = "mol", min_distance: float = 0.2, tole
 def parse_arguments():
     """Parse command line arguments."""
     parser = argparse.ArgumentParser(
-        description="Finds and labels molecules for excel and converts to pdb",
+        description="Finds and labels molecules in csv (can be opened in excel) and converts to pdb",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:
-  %(prog)s Final_cluster.xyz
-  %(prog)s input.xyz --mol-prefix molecule --output-pdb cluster.pdb
-  %(prog)s data.xyz --min-distance 0.3 --tolerance 1.5
-        """
+ %(prog)s Final_cluster.xyz
+ %(prog)s input.xyz --mol-prefix molecule --output-pdb cluster.pdb
+ %(prog)s data.xyz --min-distance 0.3 --tolerance 1.5
+ %(prog)s input.xyz --output-csv molecules.csv
+ %(prog)s input.xyz --output-excel results.xlsx --output-csv results.csv
+       """
     )
     
     parser.add_argument(
@@ -197,7 +205,12 @@ Examples:
     
     parser.add_argument(
         "--output-excel",
-        help="Output Excel filename (default: same as input with .xlsx extension)"
+        help="Output Excel filename (optional - if not provided, no Excel file will be created)"
+    )
+    
+    parser.add_argument(
+        "--output-csv",
+        help="Output CSV filename (default: same as input with .csv extension)"
     )
     
     parser.add_argument(
@@ -216,8 +229,9 @@ def tool_call():
         print(f"Error: Input file '{args.input_file}' not found.", file=sys.stderr)
         sys.exit(1)
 
-    if args.output_excel is None:
-        args.output_excel = args.input_file.replace(".xyz", ".xlsx")
+    # Set default CSV output if not specified
+    if args.output_csv is None:
+        args.output_csv = args.input_file.replace(".xyz", ".csv")
 
     try:
         if args.verbose:
@@ -226,7 +240,9 @@ def tool_call():
             print(f"Min distance: {args.min_distance}")
             print(f"Tolerance: {args.tolerance}")
             print(f"Output PDB: {args.output_pdb}")
-            print(f"Output Excel: {args.output_excel}")
+            if args.output_excel:
+                print(f"Output Excel: {args.output_excel}")
+            print(f"Output CSV: {args.output_csv}")
 
         molecules_labeled, ls_data = main(
             filename=args.input_file,
@@ -234,14 +250,17 @@ def tool_call():
             min_distance=args.min_distance,
             tolerance=args.tolerance,
             output_pdb=args.output_pdb,
-            output_excel=args.output_excel
+            output_excel=args.output_excel,
+            output_csv=args.output_csv
         )
 
         if args.verbose:
             print(f"Successfully processed {len(molecules_labeled)} molecules")
             print(f"Output files created:")
             print(f"  - PDB: {args.output_pdb}")
-            print(f"  - Excel: {args.output_excel}")
+            if args.output_excel:
+                print(f"  - Excel: {args.output_excel}")
+            print(f"  - CSV: {args.output_csv}")
 
     except Exception as e:
         print(f"Error processing file: {e}", file=sys.stderr)
