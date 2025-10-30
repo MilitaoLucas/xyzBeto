@@ -14,4 +14,4 @@ dependencies = [
 ]
 
 [project.scripts]
-xyz-convert = "convert_xyz:main"
+xyz-convert = "convert_xyz:tool_call"

@@ -208,8 +208,7 @@ Examples:
     
     return parser.parse_args()
 
-
-if __name__ == "__main__":
+def tool_call():
     """Main function to handle command-line execution."""
     args = parse_arguments()
 
@@ -247,5 +246,9 @@ if __name__ == "__main__":
     except Exception as e:
         print(f"Error processing file: {e}", file=sys.stderr)
         sys.exit(1)
+
+if __name__ == "__main__":
+    tool_call()
+
 
 
