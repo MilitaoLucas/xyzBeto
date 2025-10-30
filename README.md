@@ -1,4 +1,4 @@
-Small Script for beto
+Small Script for Dr. Beto
 Install using:
 ```bash
 uv tool install git+https://github.com/MilitaoLucas/xyzBeto
