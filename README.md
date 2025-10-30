@@ -1,4 +1,4 @@
-Small Script for Dr. Beto
+Small Script for Dr. Vojtech Jancik (Beto)
 
 Install using:
 ```bash
